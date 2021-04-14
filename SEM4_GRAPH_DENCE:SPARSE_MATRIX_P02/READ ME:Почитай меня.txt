@@ -1,0 +1,176 @@
+
+SparseMatrix -
+Разреженная матрица, в которой только те местоположения, которые были заданы значениями 
+!=, фактически существуют и потребляют память, а все остальные местоположения в разреженной матрице представлены в виде нулей.
+
+
+
+Каждый элемент представляет собой элемент stuct, который содержит значение и расположение столбца, в котором он должен существовать. Каждая строка в SparseMatrix является объектом Списка элементов, который представляет собой связанный список, содержащий объекты элементов.
+
+
+Последовательность действий:
+
+Конструктор матрицы создаёт "rows" из "new ElementList[n]", где n - кол-во рядов, где "maxCols = max; list = nullptr;"
+Затем вызывается " Put" c  "list = nullptr; maxCols = max;", где m - кол-во столбцов
+
+Затем при присвоении значения в конечном итоге создается "new Element(col,0, list);" из номера колоны, пока что значения 0 и ссылка на следующий элемент, и возвращается "newNode->value" 
+
+Далее все операции проходят либо такой же путь либо всё ещё проще - возвращают какое-то значение
+
+
+Список возможностей:
+
+SparseMatrix operator = (const SparseMatrix &rhs);
+SparseMatrix operator + (const SparseMatrix &rhs) const;
+SparseMatrix operator * (const SparseMatrix &rhs) const;
+friend bool operator == (const SparseMatrix& mtrx1, const SparseMatrix& mtrx2);
+friend bool operator != (const SparseMatrix& mtrx1, const SparseMatrix& mtrx2);
+
+Возможность вернуть или присвоить значение через [][] либо **
+
+size_t num_columns() const;
+size_t num_rows() const;
+    
+double get(size_t i, size_t j)const;
+void set(size_t i, size_t j , double a);
+
+friend ostream &operator << (ostream &out, SparseMatrix matrix); //вывод матрицы 
+
+
+
+Из минусов:
+Программа вообще не обрабатывает проблемные ситуации, при них начиняется вылет и аварии, так что просьба, не вводите заведомо ошибочные действия)
+
+
+
+К Этому добавилась возможность создавать графы по типу разряженной и полной матрицы с 
+Возможностью перегонки из одной в другой 
+
+Из спецзаданий реализован FindMax Diametr в графе 
+
+
+
+Дублировать коды я не хочу
+Костях же в 
+class IterableSquareMatrix {
+public:
+    virtual size_t GetSize() const = 0;
+    virtual double FindMax() const = 0;
+    virtual int Diametr() const = 0;
+    virtual double GetVal(size_t, size_t) const = 0;
+    virtual void SetVal(size_t, size_t, double) = 0;
+    virtual ~IterableSquareMatrix(){} //без идей что тут надо
+    virtual void AddEdge(size_t,size_t) = 0;
+    virtual void RemoveEdge(size_t,size_t) = 0;
+    virtual void SetSize(size_t) = 0;
+    
+    class row_iterator {
+        size_t row;
+        size_t column;
+        const IterableSquareMatrix & matrix;
+    public:
+        row_iterator(size_t r, size_t c, const IterableSquareMatrix & m) : row(r), column(c), matrix(m) {};
+        row_iterator & operator++();
+        row_iterator operator++(int);
+        bool operator==(const row_iterator &) const;
+        bool operator!=(const row_iterator &) const;
+        int operator*() const;
+        size_t get_column();
+    };
+
+    class column_iterator {
+        size_t row;
+        size_t column;
+        const IterableSquareMatrix & matrix;
+    public:
+        column_iterator(size_t r, size_t c, const IterableSquareMatrix & m) : row(r), column(c), matrix(m) {};
+        column_iterator & operator++();
+        column_iterator operator++(int);
+        bool operator==(const column_iterator &) const;
+        bool operator!=(const column_iterator &) const;
+        int operator*() const;
+        size_t get_row();
+    };
+    
+    
+public:
+    virtual row_iterator iterate_rows(size_t) const = 0;
+    virtual row_iterator end_row(size_t) const = 0;
+    virtual column_iterator iterate_columns(size_t) const = 0;
+    virtual column_iterator end_column(size_t) const = 0;
+    
+};;
+
+К нему в итоге все и обращаются 
+
+
+За доработками идти к разработчику
+
+
+P.S. Возможно где-то есть утечки, но при компиляции со всеми ключами они не были найдены
+Буду благодарна за помочь 
+:З
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ЗАПУСКАЕМ░░
+░ГУСЯ░▄▀▀▀▄░ГИДРУ░░
+▄███▀░◐░▄▀▀▀▄░░░� �░░
+░░▄███▀░◐░░░░▌░░� �
+░░░▐░▄▀▀▀▄░░░▌░░� �░
+▄███▀░◐░░░▌░░▌░░� �░
+░░░░▌░░░░░▐▄▄▌░░� �░░
+░░░░▌░░░░▄▀▒▒▀▀▀� �▄
+░░░▐░░░░▐▒▒▒▒▒▒▒� �▀▀▄
+░░░▐░░░░▐▄▒▒▒▒▒▒� �▒▒▒▀▄
+░░░░▀▄░░░░▀▄▒▒▒▒� �▒▒▒▒▒▀▄
+░░░░░░▀▄▄▄▄▄█▄▄▄� �▄▄▄▄▄▄▄▀▄
+░░░░░░░░░░░▌▌░▌▌� �░░░░
+░░░░░░░░░░░▌▌░▌▌� �░░░░
+░░░░░░░░░▄▄▌▌▄▌▌� �░░░░
